@@ -10,7 +10,7 @@ on:
 
 jobs:
   sync-branches:
-    uses: kyo-ago/release-bot/.github/workflows/sync-branches.yml@main
+    uses: kyo-ago/release-dashboard-action/.github/workflows/sync-branches.yml@main
     permissions:
       contents: write
       pull-requests: write

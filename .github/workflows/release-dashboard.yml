@@ -50,20 +50,20 @@ jobs:
       (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
 
     steps:
-      - name: Checkout release-bot scripts
+      - name: Checkout release-dashboard-action scripts
         uses: actions/checkout@v4
         with:
-          repository: kyo-ago/release-bot
+          repository: kyo-ago/release-dashboard-action
           # Use main when called as a reusable workflow; otherwise use the current ref
           ref: ${{ github.event_name == 'workflow_call' && 'main' || github.ref }}
-          path: release-bot
+          path: release-dashboard-action
 
       - name: Update Release Dashboard
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const updateDashboard = require('./release-bot/.github/scripts/update-dashboard.js');
+            const updateDashboard = require('./release-dashboard-action/.github/scripts/update-dashboard.js');
             const developBranch = '${{ inputs.develop_branch }}' || 'develop';
             const mainBranch = '${{ inputs.main_branch }}' || 'main';
             await updateDashboard({ github, context, developBranch, mainBranch });

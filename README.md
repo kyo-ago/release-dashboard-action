@@ -36,7 +36,7 @@ on:
 
 jobs:
   call-release-dashboard:
-    uses: kyo-ago/release-bot/.github/workflows/release-dashboard.yml@main
+    uses: kyo-ago/release-dashboard-action/.github/workflows/release-dashboard.yml@main
     permissions:
       contents: read
       issues: write
@@ -67,7 +67,7 @@ Runs automatically in the following cases:
 ```yaml
 jobs:
   call-release-dashboard:
-    uses: kyo-ago/release-bot/.github/workflows/release-dashboard.yml@main
+    uses: kyo-ago/release-dashboard-action/.github/workflows/release-dashboard.yml@main
     with:
       develop_branch: 'staging'
       main_branch: 'production'
@@ -81,13 +81,13 @@ jobs:
 
 ```yaml
 # Latest
-uses: kyo-ago/release-bot/.github/workflows/release-dashboard.yml@main
+uses: kyo-ago/release-dashboard-action/.github/workflows/release-dashboard.yml@main
 
 # Pin by tag
-uses: kyo-ago/release-bot/.github/workflows/release-dashboard.yml@v1.0.0
+uses: kyo-ago/release-dashboard-action/.github/workflows/release-dashboard.yml@v1.0.0
 
 # Pin by commit hash
-uses: kyo-ago/release-bot/.github/workflows/release-dashboard.yml@abc1234
+uses: kyo-ago/release-dashboard-action/.github/workflows/release-dashboard.yml@abc1234
 ```
 
 ## 🔄 Squash Merge Support
@@ -110,7 +110,7 @@ on:
 
 jobs:
   sync-branches:
-    uses: kyo-ago/release-bot/.github/workflows/sync-branches.yml@main
+    uses: kyo-ago/release-dashboard-action/.github/workflows/sync-branches.yml@main
     permissions:
       contents: write
       pull-requests: write
@@ -128,7 +128,7 @@ jobs:
 ```yaml
 jobs:
   sync-branches:
-    uses: kyo-ago/release-bot/.github/workflows/sync-branches.yml@main
+    uses: kyo-ago/release-dashboard-action/.github/workflows/sync-branches.yml@main
     with:
       develop_branch: 'develop'  # Custom branch name
       main_branch: 'main'        # Custom branch name

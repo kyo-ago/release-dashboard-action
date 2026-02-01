@@ -19,7 +19,7 @@ jobs:
     # @main - always use the latest
     # @v1.0.0 - use tag v1.0.0
     # @554e2c7 # v0.1.0 - pin by commit hash (recommended with version comment)
-    uses: kyo-ago/release-bot/.github/workflows/release-dashboard.yml@554e2c7 # v0.1.0
+    uses: kyo-ago/release-dashboard-action/.github/workflows/release-dashboard.yml@554e2c7 # v0.1.0
     permissions:
       contents: read
       issues: write

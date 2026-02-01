@@ -53,13 +53,13 @@ jobs:
       (github.event_name == 'push' && github.ref == 'refs/heads/main')
 
     steps:
-      - name: Checkout release-bot scripts
+      - name: Checkout release-dashboard-action scripts
         uses: actions/checkout@v4
         with:
-          repository: kyo-ago/release-bot
+          repository: kyo-ago/release-dashboard-action
           # Use main when called as a reusable workflow; otherwise use the current ref
           ref: ${{ github.event_name == 'workflow_call' && 'main' || github.ref }}
-          path: release-bot
+          path: release-dashboard-action
 
       - name: Checkout target repository
         uses: actions/checkout@v4
@@ -79,8 +79,8 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          chmod +x ../release-bot/.github/scripts/sync-branches.sh
-          ../release-bot/.github/scripts/sync-branches.sh \
+          chmod +x ../release-dashboard-action/.github/scripts/sync-branches.sh
+          ../release-dashboard-action/.github/scripts/sync-branches.sh \
             "${{ inputs.main_branch || 'main' }}" \
             "${{ inputs.develop_branch || 'develop' }}" \
             "${{ inputs.auto_merge != 'false' }}"
