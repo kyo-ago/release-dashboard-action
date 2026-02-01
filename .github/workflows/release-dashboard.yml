@@ -1,0 +1,69 @@
+name: 🚀 Release Dashboard
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+  pull_request:
+    types: [closed]
+    branches:
+      - develop
+      - main
+  workflow_dispatch:  # Manual run is also available
+    inputs:
+      develop_branch:
+        description: 'Develop branch name (default: develop)'
+        required: false
+        default: 'develop'
+        type: string
+      main_branch:
+        description: 'Main branch name (default: main)'
+        required: false
+        default: 'main'
+        type: string
+  workflow_call:  # Callable from external repositories
+    inputs:
+      develop_branch:
+        description: 'Develop branch name (default: develop)'
+        required: false
+        default: 'develop'
+        type: string
+      main_branch:
+        description: 'Main branch name (default: main)'
+        required: false
+        default: 'main'
+        type: string
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: read
+
+jobs:
+  update-dashboard:
+    runs-on: ubuntu-latest
+    # Run only on push, workflow_dispatch, or merged pull_request events
+    if: |
+      github.event_name == 'push' ||
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
+
+    steps:
+      - name: Checkout release-bot scripts
+        uses: actions/checkout@v4
+        with:
+          repository: kyo-ago/release-bot
+          # Use main when called as a reusable workflow; otherwise use the current ref
+          ref: ${{ github.event_name == 'workflow_call' && 'main' || github.ref }}
+          path: release-bot
+
+      - name: Update Release Dashboard
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const updateDashboard = require('./release-bot/.github/scripts/update-dashboard.js');
+            const developBranch = '${{ inputs.develop_branch }}' || 'develop';
+            const mainBranch = '${{ inputs.main_branch }}' || 'main';
+            await updateDashboard({ github, context, developBranch, mainBranch });

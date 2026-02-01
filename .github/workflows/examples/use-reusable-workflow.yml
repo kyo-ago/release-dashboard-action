@@ -1,0 +1,39 @@
+# Example: use the reusable workflow
+# Place this file at .github/workflows/release-dashboard.yml
+
+name: 🚀 Release Dashboard
+
+on:
+  # Run on push to develop
+  push:
+    branches:
+      - develop
+  # Run on PR merge to develop
+  pull_request:
+    types: [closed]
+    branches:
+      - develop
+  # Manual run is also available
+  workflow_dispatch:
+    inputs:
+      develop_branch:
+        description: 'Develop branch name'
+        required: false
+        default: 'develop'
+        type: string
+      main_branch:
+        description: 'Main branch name'
+        required: false
+        default: 'main'
+        type: string
+
+jobs:
+  call-release-dashboard:
+    uses: kyo-ago/release-bot/.github/workflows/release-dashboard.yml@554e2c7 # v0.1.0
+    with:
+      develop_branch: ${{ inputs.develop_branch || 'develop' }}
+      main_branch: ${{ inputs.main_branch || 'main' }}
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: read

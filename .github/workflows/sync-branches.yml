@@ -1,0 +1,86 @@
+name: 🔄 Sync Main to Develop
+
+on:
+  push:
+    branches:
+      - main
+  workflow_call:  # Callable from external repositories
+    inputs:
+      develop_branch:
+        description: 'Develop branch name (default: develop)'
+        required: false
+        default: 'develop'
+        type: string
+      main_branch:
+        description: 'Main branch name (default: main)'
+        required: false
+        default: 'main'
+        type: string
+      auto_merge:
+        description: 'Auto-merge when there are no conflicts (default: true)'
+        required: false
+        default: true
+        type: boolean
+  workflow_dispatch:  # Manual run is also available
+    inputs:
+      develop_branch:
+        description: 'Develop branch name (default: develop)'
+        required: false
+        default: 'develop'
+        type: string
+      main_branch:
+        description: 'Main branch name (default: main)'
+        required: false
+        default: 'main'
+        type: string
+      auto_merge:
+        description: 'Auto-merge when there are no conflicts'
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync-branches:
+    runs-on: ubuntu-latest
+    # Run only for push to main (workflow_dispatch/workflow_call always run)
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      github.event_name == 'workflow_call' ||
+      (github.event_name == 'push' && github.ref == 'refs/heads/main')
+
+    steps:
+      - name: Checkout release-bot scripts
+        uses: actions/checkout@v4
+        with:
+          repository: kyo-ago/release-bot
+          # Use main when called as a reusable workflow; otherwise use the current ref
+          ref: ${{ github.event_name == 'workflow_call' && 'main' || github.ref }}
+          path: release-bot
+
+      - name: Checkout target repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch full history (for branch comparison)
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: repo
+
+      - name: Configure Git
+        working-directory: repo
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Sync main to develop
+        working-directory: repo
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          chmod +x ../release-bot/.github/scripts/sync-branches.sh
+          ../release-bot/.github/scripts/sync-branches.sh \
+            "${{ inputs.main_branch || 'main' }}" \
+            "${{ inputs.develop_branch || 'develop' }}" \
+            "${{ inputs.auto_merge != 'false' }}"
