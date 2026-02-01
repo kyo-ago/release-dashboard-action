@@ -11,7 +11,7 @@ const mockContextDevelop = {
   ref: 'refs/heads/develop',
   repo: {
     owner: 'kyo-ago',
-    repo: 'release-bot'
+    repo: 'release-dashboard-action'
   },
   payload: {}
 };
@@ -22,7 +22,7 @@ const mockContextMain = {
   ref: 'refs/heads/main',
   repo: {
     owner: 'kyo-ago',
-    repo: 'release-bot'
+    repo: 'release-dashboard-action'
   },
   payload: {}
 };
@@ -33,7 +33,7 @@ const mockContextPRToMain = {
   ref: 'refs/heads/main',
   repo: {
     owner: 'kyo-ago',
-    repo: 'release-bot'
+    repo: 'release-dashboard-action'
   },
   payload: {
     pull_request: {
