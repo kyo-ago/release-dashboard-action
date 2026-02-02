@@ -5,11 +5,6 @@ on:
     branches:
       - develop
       - main
-  pull_request:
-    types: [closed]
-    branches:
-      - develop
-      - main
   workflow_dispatch:  # Manual run is also available
     inputs:
       develop_branch:
