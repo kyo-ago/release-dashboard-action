@@ -280,14 +280,15 @@ function generateIssueBody(unreleasedPRs, owner, repo, developBranch, mainBranch
  */
 async function updateDashboardIssue(github, owner, repo, issueBody) {
   // Find existing dashboard issue
-  const existingIssues = await github.rest.issues.listForRepo({
+  const existingIssues = await github.paginate(github.rest.issues.listForRepo, {
     owner,
     repo,
     labels: DASHBOARD_LABEL,
-    state: 'open'
+    state: 'open',
+    per_page: 100
   });
 
-  const dashboardIssue = existingIssues.data.find(issue => issue.title === DASHBOARD_TITLE);
+  const dashboardIssue = existingIssues.find(issue => !issue.pull_request && issue.title === DASHBOARD_TITLE);
 
   // Update if an existing issue is found
   if (dashboardIssue) {
