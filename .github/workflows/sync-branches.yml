@@ -54,7 +54,7 @@ jobs:
 
     steps:
       - name: Checkout release-dashboard-action scripts
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           repository: kyo-ago/release-dashboard-action
           # Use main when called as a reusable workflow; otherwise use the current ref
@@ -62,7 +62,7 @@ jobs:
           path: release-dashboard-action
 
       - name: Checkout target repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0  # Fetch full history (for branch comparison)
           token: ${{ secrets.GITHUB_TOKEN }}
