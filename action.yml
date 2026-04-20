@@ -1,0 +1,43 @@
+name: 'Release Dashboard'
+description: 'Track PRs merged into the develop branch but not yet released to main, and surface them in a dedicated dashboard issue.'
+author: 'kyo-ago'
+branding:
+  icon: 'git-pull-request'
+  color: 'blue'
+
+inputs:
+  develop_branch:
+    description: 'Develop branch name'
+    required: false
+    default: 'develop'
+  main_branch:
+    description: 'Main branch name'
+    required: false
+    default: 'main'
+  github_token:
+    description: 'Token used to read PRs/commits and write the dashboard issue (needs contents:read, issues:write, pull-requests:read).'
+    required: false
+    default: ${{ github.token }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Update Release Dashboard
+      uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
+      env:
+        RELEASE_DASHBOARD_DEVELOP_BRANCH: ${{ inputs.develop_branch }}
+        RELEASE_DASHBOARD_MAIN_BRANCH: ${{ inputs.main_branch }}
+        RELEASE_DASHBOARD_ACTION_PATH: ${{ github.action_path }}
+      with:
+        github-token: ${{ inputs.github_token }}
+        script: |
+          const path = require('path');
+          const updateDashboard = require(
+            path.join(process.env.RELEASE_DASHBOARD_ACTION_PATH, '.github/scripts/update-dashboard.js')
+          );
+          await updateDashboard({
+            github,
+            context,
+            developBranch: process.env.RELEASE_DASHBOARD_DEVELOP_BRANCH,
+            mainBranch: process.env.RELEASE_DASHBOARD_MAIN_BRANCH,
+          });

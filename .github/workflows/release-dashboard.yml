@@ -17,7 +17,7 @@ on:
         required: false
         default: 'main'
         type: string
-  workflow_call:  # Callable from external repositories
+  workflow_call:  # Callable from external repositories (public callers only; private callers must use the composite action instead)
     inputs:
       develop_branch:
         description: 'Develop branch name (default: develop)'
@@ -45,7 +45,13 @@ jobs:
       (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
 
     steps:
-      - name: Checkout release-dashboard-action scripts
+      # NOTE: This checkout uses the caller's GITHUB_TOKEN. It only succeeds when
+      # the caller can read kyo-ago/release-dashboard-action (public callers, or
+      # private callers that supply a token with read access). Private callers
+      # should switch to the composite action (uses: kyo-ago/release-dashboard-action@<ref>)
+      # instead, which is fetched via the runner's action download path and
+      # respects the organization's "Actions can access this repository" setting.
+      - name: Checkout release-dashboard-action
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           repository: kyo-ago/release-dashboard-action
@@ -54,11 +60,7 @@ jobs:
           path: release-dashboard-action
 
       - name: Update Release Dashboard
-        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
+        uses: ./release-dashboard-action
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const updateDashboard = require('./release-dashboard-action/.github/scripts/update-dashboard.js');
-            const developBranch = '${{ inputs.develop_branch }}' || 'develop';
-            const mainBranch = '${{ inputs.main_branch }}' || 'main';
-            await updateDashboard({ github, context, developBranch, mainBranch });
+          develop_branch: ${{ inputs.develop_branch || 'develop' }}
+          main_branch: ${{ inputs.main_branch || 'main' }}

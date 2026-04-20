@@ -14,7 +14,7 @@ Automatically tracks PRs merged into the develop branch but not yet released to 
 - Removes items automatically after release to the main branch
 - **Supports all merge methods: Squash, Rebase, and Merge commit**
 - **Automatic merge-back when using Squash merge**
-- Usable from external repositories as a reusable workflow
+- Usable from external repositories as a composite action (recommended) or as a reusable workflow
 - Supports custom branch names
 
 ## 🚀 Quick Start
@@ -28,22 +28,36 @@ on:
   push:
     branches:
       - develop
-  pull_request:
-    types: [closed]
-    branches:
-      - develop
+      - main
   workflow_dispatch:
 
+permissions:
+  contents: read
+  issues: write
+  pull-requests: read
+
 jobs:
-  call-release-dashboard:
-    uses: kyo-ago/release-dashboard-action/.github/workflows/release-dashboard.yml@main
-    permissions:
-      contents: read
-      issues: write
-      pull-requests: read
+  update-dashboard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: kyo-ago/release-dashboard-action@main
 ```
 
 Commit and push to finish.
+
+> **Note**
+> The composite action (`uses: kyo-ago/release-dashboard-action@<ref>`) is the
+> recommended invocation. The runner downloads it via the standard action
+> distribution path, which works for private callers as long as the
+> organization allows it under **Settings → Actions → General → Access**.
+>
+> A reusable-workflow form
+> (`uses: kyo-ago/release-dashboard-action/.github/workflows/release-dashboard.yml@<ref>`)
+> is still provided for backward compatibility, but it relies on
+> `actions/checkout` to pull this repository using the caller's `GITHUB_TOKEN`.
+> Private callers cannot read another private repository with `GITHUB_TOKEN`,
+> so the reusable-workflow form fails with `repository not found` for that
+> case. Use the composite action instead.
 
 ## 🎯 Usage
 
@@ -66,28 +80,30 @@ Runs automatically in the following cases:
 
 ```yaml
 jobs:
-  call-release-dashboard:
-    uses: kyo-ago/release-dashboard-action/.github/workflows/release-dashboard.yml@main
-    with:
-      develop_branch: 'staging'
-      main_branch: 'production'
+  update-dashboard:
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       issues: write
       pull-requests: read
+    steps:
+      - uses: kyo-ago/release-dashboard-action@main
+        with:
+          develop_branch: staging
+          main_branch: production
 ```
 
 ### Version Pinning
 
 ```yaml
 # Latest
-uses: kyo-ago/release-dashboard-action/.github/workflows/release-dashboard.yml@main
+- uses: kyo-ago/release-dashboard-action@main
 
 # Pin by tag
-uses: kyo-ago/release-dashboard-action/.github/workflows/release-dashboard.yml@v1.0.0
+- uses: kyo-ago/release-dashboard-action@v1.0.0
 
 # Pin by commit hash
-uses: kyo-ago/release-dashboard-action/.github/workflows/release-dashboard.yml@abc1234
+- uses: kyo-ago/release-dashboard-action@abc1234
 ```
 
 ## 🔄 Squash Merge Support
